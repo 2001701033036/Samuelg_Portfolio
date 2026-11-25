@@ -1,0 +1,221 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply bg-ink;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-ink font-sans text-white antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    @apply bg-lime text-ink;
+  }
+
+  /* Lenis smooth scroll (from lenis/dist/lenis.css). */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+}
+
+@layer components {
+  /* Glassmorphism panel: blurred dark glass with a thin light border. */
+  .glass {
+    @apply border border-white/10 bg-white/[0.04] backdrop-blur-xl;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 20px 60px -30px rgb(0 0 0 / 0.8);
+  }
+
+  .hud-label {
+    @apply font-mono text-[10px] uppercase tracking-[0.22em] sm:text-[11px];
+  }
+
+  .display {
+    @apply font-display font-black uppercase leading-[0.9] tracking-tight;
+  }
+
+  /* Lime pill call-to-action. */
+  .btn-lime {
+    @apply inline-flex min-h-[48px] items-center gap-3 rounded-full bg-lime px-6 font-mono text-xs font-bold uppercase
+      tracking-[0.15em] text-ink transition-transform duration-300 hover:scale-[1.04]
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime focus-visible:ring-offset-4 focus-visible:ring-offset-ink;
+    box-shadow: 0 0 40px -8px rgb(212 255 58 / 0.6);
+  }
+
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime focus-visible:ring-offset-2 focus-visible:ring-offset-ink;
+  }
+
+  .grid-lines {
+    background-image: linear-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+
+  .noise {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Hero portrait cutout: neon rim light + soft glow behind the figure */
+.portrait-rim {
+  /* The photo already carries its own neon edge light; this only adds a soft halo. */
+  filter:
+    drop-shadow(-12px 0 26px rgb(139 92 246 / 0.4))
+    drop-shadow(12px 0 26px rgb(34 211 238 / 0.3));
+}
+.portrait-glow {
+  position: absolute;
+  inset: 10% 10% 0;
+  z-index: -1;
+  border-radius: 9999px;
+  background: radial-gradient(closest-side, rgb(124 58 237 / 0.45), rgb(34 211 238 / 0.12) 60%, transparent);
+  filter: blur(30px);
+  animation: portrait-pulse 6s ease-in-out infinite;
+}
+@keyframes portrait-pulse {
+  0%, 100% { opacity: 0.75; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .portrait-glow { animation: none; }
+}
+
+/* ------------------------------------------------------------------ */
+/* Portrait story (components/sections/Story.js + story/SceneFx.js).  */
+/* GSAP owns every transform; CSS here is static styling only.        */
+/* ------------------------------------------------------------------ */
+.ps-rig {
+  position: absolute; bottom: 0; left: 0; right: 0; margin: 0 auto;
+  width: min(88vw, 440px); height: 58svh; transform-origin: 50% 85%;
+  font-size: clamp(7px, 2.2vw, 10px); color: #fff; will-change: transform, opacity;
+}
+@media (min-width: 768px) {
+  .ps-rig { left: auto; right: 5%; margin: 0; width: 42vw; height: 92svh; font-size: clamp(8px, 0.75vw, 14px); }
+}
+.ps-me {
+  position: relative; z-index: 1; width: 100%; height: 100%; object-fit: contain; object-position: bottom center;
+  user-select: none;
+  filter: drop-shadow(-10px 0 24px rgb(139 92 246 / 0.45)) drop-shadow(10px 0 24px rgb(34 211 238 / 0.35));
+}
+.ps-glow { position: absolute; inset: 6% 2% 14%; z-index: 0; border-radius: 9999px; filter: blur(42px); }
+.ps-tint {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none; mix-blend-mode: overlay; opacity: 0.85;
+  -webkit-mask-size: contain; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: bottom center; mask-position: bottom center;
+}
+/* Scene effect layers. On phones they are pulled in so side cards stay on screen. */
+.ps-fx { position: absolute; inset: 0; transform: scale(0.74); transform-origin: 50% 40%; }
+@media (min-width: 768px) { .ps-fx { transform: none; } }
+.ps-rig-fade { position: absolute; inset: auto 0 0; height: 22%; z-index: 3; background: linear-gradient(to top, #07080c, transparent); }
+.ps-floor {
+  position: absolute; left: -20%; right: -20%; bottom: 0; height: 42%;
+  background-image: linear-gradient(rgb(103 232 249 / 0.12) 1px, transparent 1px), linear-gradient(90deg, rgb(103 232 249 / 0.12) 1px, transparent 1px);
+  background-size: 70px 70px; transform: perspective(600px) rotateX(68deg); transform-origin: bottom;
+  -webkit-mask-image: linear-gradient(to top, #000, transparent 85%); mask-image: linear-gradient(to top, #000, transparent 85%);
+}
+.ps-flash {
+  position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen;
+  background: linear-gradient(105deg, transparent 35%, rgb(212 255 58 / 0.18) 46%, rgb(255 255 255 / 0.4) 50%, rgb(34 211 238 / 0.18) 54%, transparent 65%);
+}
+
+/* shared */
+.ps-card {
+  display: inline-flex; align-items: center; gap: 0.6em; padding: 0.8em 1em; border-radius: 0.9em;
+  border: 1px solid rgb(255 255 255 / 0.14); background: rgb(7 8 12 / 0.62); backdrop-filter: blur(10px);
+  box-shadow: 0 0 30px -12px rgb(34 211 238 / 0.6);
+}
+.ps-card-label { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.75em; letter-spacing: 0.14em; text-transform: uppercase; color: rgb(255 255 255 / 0.5); }
+.ps-stroke { fill: none; stroke-width: 1.6; stroke-linecap: round; }
+
+/* design */
+.ps-guide { position: absolute; background: rgb(103 232 249 / 0.22); }
+.ps-anchor { display: block; width: 0.9em; height: 0.9em; border: 1.5px solid #d4ff3a; background: #07080c; box-shadow: 0 0 10px #d4ff3a; }
+.ps-frame { position: absolute; z-index: 4; border: 1px solid rgb(103 232 249 / 0.85); box-shadow: 0 0 24px -6px rgb(34 211 238 / 0.8); }
+.ps-frame i { position: absolute; width: 0.7em; height: 0.7em; background: #fff; border: 1px solid #22d3ee; }
+.ps-frame-label, .ps-frame-size {
+  position: absolute; padding: 0.15em 0.5em; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.8em;
+  background: #22d3ee; color: #07080c; font-weight: 700;
+}
+.ps-frame-label { left: 0; top: 0; }
+.ps-frame-size { right: 0; bottom: 0; }
+.ps-swatch { display: block; width: 1.6em; height: 1.6em; border-radius: 9999px; box-shadow: 0 0 12px currentColor; }
+.ps-toggle { position: relative; display: inline-block; width: 2.4em; height: 1.3em; border-radius: 9999px; background: rgb(212 255 58 / 0.85); }
+.ps-toggle i { position: absolute; right: 0.15em; top: 0.15em; width: 1em; height: 1em; border-radius: 9999px; background: #07080c; }
+.ps-cursor { display: flex; align-items: flex-start; gap: 0.15em; filter: drop-shadow(0 0 8px rgb(212 255 58 / 0.6)); }
+.ps-cursor b { margin-top: 1em; padding: 0.1em 0.5em; border-radius: 0.3em; background: #d4ff3a; color: #07080c; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.8em; }
+
+/* develop */
+.ps-screen {
+  display: flex; flex-direction: column; gap: 0.7em; width: 100%; height: 100%; padding: 1.2em; border-radius: 1em;
+  border: 1px solid rgb(103 232 249 / 0.35); background: linear-gradient(160deg, rgb(34 211 238 / 0.12), rgb(139 92 246 / 0.08));
+  box-shadow: 0 0 50px -10px rgb(34 211 238 / 0.55), inset 0 0 30px -15px rgb(34 211 238 / 0.6);
+}
+.ps-code-bar { display: block; height: 0.55em; border-radius: 0.3em; background: rgb(103 232 249 / 0.4); }
+.ps-code-bar:nth-child(3n) { background: rgb(167 139 250 / 0.5); }
+.ps-code-bar:nth-child(4n) { background: rgb(212 255 58 / 0.45); }
+.ps-beam { position: absolute; width: 2px; height: 140%; background: linear-gradient(to bottom, transparent, #22d3ee, transparent); box-shadow: 0 0 20px 4px rgb(34 211 238 / 0.45); }
+.ps-editor { gap: 0.45em; font-size: 0.95em; }
+.ps-symbol { display: block; font-family: "JetBrains Mono", ui-monospace, monospace; font-weight: 800; font-size: 2.2em; text-shadow: 0 0 18px currentColor; }
+
+/* deploy */
+.ps-rack {
+  position: absolute; display: flex; flex-direction: column; gap: 0.35em; padding: 0.5em; border-radius: 0.6em;
+  border: 1px solid rgb(255 255 255 / 0.1); background: rgb(11 16 32 / 0.8); box-shadow: 0 0 40px -14px rgb(34 211 238 / 0.6);
+}
+.ps-rack-unit { flex: 1; display: flex; align-items: center; gap: 0.4em; padding: 0 0.45em; border-radius: 0.2em; background: rgb(255 255 255 / 0.04); border: 1px solid rgb(255 255 255 / 0.06); }
+.ps-rack-unit i { width: 0.5em; height: 0.5em; flex: none; border-radius: 9999px; background: #d4ff3a; box-shadow: 0 0 8px #d4ff3a; }
+.ps-rack-unit i.ps-led-cyan { background: #22d3ee; box-shadow: 0 0 8px #22d3ee; }
+.ps-rack-unit b { flex: 1; height: 1px; background: rgb(255 255 255 / 0.12); }
+.ps-ring-track { fill: none; stroke: rgb(255 255 255 / 0.08); stroke-width: 0.8; }
+.ps-ring { fill: none; stroke: #22d3ee; stroke-width: 1.2; stroke-linecap: round; filter: drop-shadow(0 0 3px #22d3ee); }
+.ps-pipeline { gap: 0.6em; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.95em; color: rgb(255 255 255 / 0.8); }
+.ps-step { display: grid; place-items: center; width: 1.8em; height: 1.8em; border-radius: 9999px; border: 1px solid rgb(103 232 249 / 0.45); background: #07080c; color: #67e8f9; }
+.ps-step .ps-step-live { color: #d4ff3a; text-shadow: 0 0 10px #d4ff3a; }
+.ps-status {
+  display: inline-block; padding: 0.5em 1em; border-radius: 9999px; white-space: nowrap;
+  font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.95em;
+  border: 1px solid rgb(103 232 249 / 0.5); background: rgb(34 211 238 / 0.1); color: #a5f3fc; box-shadow: 0 0 20px -6px rgb(34 211 238 / 0.8);
+}
+.ps-status-live { border-color: rgb(212 255 58 / 0.7); background: rgb(212 255 58 / 0.1); color: #d4ff3a; animation: ps-live 1.4s ease-in-out infinite; }
+@keyframes ps-live { 0%, 100% { box-shadow: 0 0 12px -4px rgb(212 255 58 / 0.6); } 50% { box-shadow: 0 0 28px 2px rgb(212 255 58 / 0.8); } }
+
+/* client */
+.ps-node {
+  display: inline-block; padding: 0.55em 1em; border-radius: 9999px; white-space: nowrap;
+  font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.95em;
+  border: 1px solid rgb(255 255 255 / 0.16); background: rgb(7 8 12 / 0.7); color: rgb(255 255 255 / 0.88);
+  box-shadow: 0 0 24px -8px rgb(139 92 246 / 0.9);
+}
+.ps-node-main { font-size: 1.15em; border-color: rgb(167 139 250 / 0.8); color: #ddd6fe; }
+.ps-success {
+  display: inline-flex; align-items: center; gap: 0.6em; padding: 0.8em 1.4em; border-radius: 9999px; white-space: nowrap;
+  font-family: Unbounded, "Arial Black", sans-serif; font-weight: 800; font-size: 1.05em;
+  border: 1px solid rgb(212 255 58 / 0.6); background: rgb(212 255 58 / 0.1); box-shadow: 0 0 40px -8px rgb(212 255 58 / 0.7);
+}
+.ps-success-check { display: grid; place-items: center; width: 1.6em; height: 1.6em; border-radius: 9999px; background: #d4ff3a; color: #07080c; }
