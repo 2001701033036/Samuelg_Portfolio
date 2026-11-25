@@ -40,7 +40,7 @@ export const person = {
   phone: "+91 6382209943",
   phoneHref: "tel:+916382209943",
   location: "Tamil Nadu, India",
-  resume: "https://drive.google.com/file/d/1ImHqFXZVcj3IgPX4QAWsOc6wEvNRoti2/view",
+  resume: "https://drive.google.com/file/d/1AV2FsHBTIXiuQzS6zc2w_RYb_GloSlm_/view?usp=drive_link",
 };
 
 export const socials = [
