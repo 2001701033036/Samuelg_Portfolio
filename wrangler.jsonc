@@ -1,6 +1,6 @@
 // Cloudflare Workers static-site config: serves the CRA production build.
 {
-  "name": "samuel-portfolio-v2",
+  "name": "samuel-portfolio",
   "compatibility_date": "2025-11-01",
   "assets": {
     "directory": "./build",
