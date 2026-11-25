@@ -24,3 +24,6 @@ yarn-error.log*
 
 # original AI clips (web versions live in public/images)
 /media-originals
+
+# wrangler local cache
+.wrangler
